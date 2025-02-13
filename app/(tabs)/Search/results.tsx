@@ -7,24 +7,29 @@ import {
   FlatList,
   Pressable,
   Image,
+  ScrollView,
 } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { mainGray, primaryOrange } from "@/constants/Colors";
+import { mainGray, primaryOrange, tabGray } from "@/constants/Colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { animeSearch } from "@/api/api";
 import { StyleSheet } from "react-native";
+import { useNavigation } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
 
-const fetchSearch = async (search: string) => {
+const fetchSearch = async ({ pageParam = 1 }, search: string) => {
+  console.log("fetchSearch", pageParam, search);
   const variables = {
     genres: undefined,
     year: undefined,
     search: search,
     season: undefined,
     seasonYear: undefined,
-    page: 1,
+    page: pageParam,
     sort: undefined,
   };
   const response = await animeSearch(variables);
@@ -36,7 +41,29 @@ const Search = () => {
   const [searches, setSearches] = useState<string[]>([]);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [showGrid, setShowGrid] = useState<boolean>(true);
+  const navigation = useNavigation();
   const colorScheme = useColorScheme();
+
+  const handleHeaderButtonClick = () => {
+    setShowGrid((prev) => {
+      return !prev;
+    });
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable onPress={handleHeaderButtonClick}>
+          <Ionicons
+            name={showGrid ? "list" : "grid"}
+            size={24}
+            color={primaryOrange}
+          />
+        </Pressable>
+      ),
+    });
+  }, [navigation, showGrid, setShowGrid]);
 
   useEffect(() => {
     getSearches().then((searches) => {
@@ -63,7 +90,6 @@ const Search = () => {
   };
 
   const handleSearchSubmit = (text: string) => {
-    console.log("searching for", text);
     storeSearch(text);
   };
 
@@ -85,10 +111,7 @@ const Search = () => {
   const storeSearch = async (text: string) => {
     try {
       const searches = await getSearches();
-      const updatedSearches = [
-        text,
-        ...(searches.length === 10 ? searches.splice(1, 10) : searches),
-      ];
+      const updatedSearches = [text, ...searches.splice(0, 9)];
       await AsyncStorage.setItem("searches", JSON.stringify(updatedSearches));
       setSearches(updatedSearches);
     } catch (error) {
@@ -101,13 +124,44 @@ const Search = () => {
     setShowResults(false);
   };
 
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ["searches", search],
-    queryFn: () => fetchSearch(search),
+  const onReachEnd = () => {
+    if (isFetching || !hasNextPage) {
+      return;
+    }
+    fetchNextPage();
+  };
+
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchNextPageError,
+  } = useInfiniteQuery({
+    queryKey: ["search", search],
+    queryFn: ({ pageParam }) => fetchSearch({ pageParam }, search),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.data.Page.pageInfo.hasNextPage) {
+        return pages.length + 1;
+      }
+    },
+    getPreviousPageParam: (firstPage, pages) => {
+      if (firstPage.data.Page.pageInfo.currentPage > 1) {
+        return pages.length - 1;
+      }
+    },
     enabled: showResults,
   });
 
-  console.log(data);
+  if (error) {
+    return (
+      <Text style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}>
+        Error fetching data
+      </Text>
+    );
+  }
 
   return (
     <ThemedView>
@@ -131,7 +185,7 @@ const Search = () => {
           <Octicons name="x-circle-fill" size={24} color={primaryOrange} />
         </Pressable>
       </View>
-      <View className="h-screen">
+      <View className="h-full">
         {!showResults || !data ? (
           <View>
             <View className="flex flex-row justify-between pt-10">
@@ -174,41 +228,109 @@ const Search = () => {
             />
           </View>
         ) : (
-          <View className="py-4">
-            <FlatList
-              data={data.data.Page.media}
-              renderItem={({ item: media }) => {
-                return (
-                  <View className="w-1/2 p-2">
-                    <View className="flex flex-col items-center">
-                      <Image
-                        style={{ width: 170, height: 255 }}
-                        source={{ uri: media.coverImage.extraLarge }}
-                      />
-                      <Text
-                        style={{
-                          color: colorScheme === "dark" ? "#fff" : "#000",
-                        }}
-                        className="text-lg font-semibold pt-2 text-center max-w-[170px] line-clamp-1"
-                      >
-                        {media.title.english || media.title.native}
-                      </Text>
-                      <Text
-                        style={{
-                          color: colorScheme === "dark" ? "#aaa" : "#4b5563",
-                        }}
-                        className="text-md text-center pb-2 line-clamp-2 max-w-[170px]"
-                      >
-                        {media.description.replace(/<[^>]*>/g, "")}
-                      </Text>
+          <View className="pt-4 mb-10 h-full">
+            {showGrid ? (
+              <FlatList
+                key="grid"
+                className="h-full"
+                data={extractAndDeDuplicatedAnimes(data)}
+                renderItem={({ item: media }) => {
+                  return (
+                    <View className="w-1/2 p-2 h-full">
+                      <View className="flex flex-col items-center">
+                        <Image
+                          style={{ width: 170, height: 255 }}
+                          source={{ uri: media.coverImage.extraLarge }}
+                        />
+                        <Text
+                          style={{
+                            color: colorScheme === "dark" ? "#fff" : "#000",
+                          }}
+                          className="text-lg font-semibold pt-2 text-center max-w-[170px] line-clamp-1"
+                        >
+                          {media.title.english || media.title.native}
+                        </Text>
+                        <Text
+                          style={{
+                            color: colorScheme === "dark" ? "#aaa" : "#4b5563",
+                          }}
+                          className="text-md text-center pb-2 line-clamp-2 max-w-[170px]"
+                        >
+                          {media.description
+                            ? media.description.replace(/<[^>]*>/g, "")
+                            : ""}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                );
-              }}
-              keyExtractor={(item) => item.idMal.toString()}
-              numColumns={2} // Ensure that FlatList renders two columns
-              contentContainerStyle={styles.gridContainer} // Use the StyleSheet for contentContainerStyle
-            />
+                  );
+                }}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                contentContainerStyle={styles.gridContainer}
+                onEndReached={onReachEnd}
+                onEndReachedThreshold={0.5}
+              />
+            ) : (
+              <FlatList
+                key="list"
+                className="h-full first:rounded-t-xl last:rounded-b-xl"
+                data={extractAndDeDuplicatedAnimes(data)}
+                renderItem={({ item: media }) => {
+                  return (
+                    <View
+                      className="flex flex-row items-center border-b-[1px]"
+                      style={{
+                        borderColor: colorScheme === "dark" ? "black" : "white",
+                        backgroundColor:
+                          colorScheme === "dark" ? tabGray : mainGray,
+                      }}
+                    >
+                      <Image
+                        width={80}
+                        height={120}
+                        source={{ uri: media.coverImage.extraLarge }}
+                        className="pl-3 py-3"
+                      />
+                      <View className="pl-3 pb-2">
+                        <Text
+                          style={{
+                            color: colorScheme === "dark" ? "#fff" : "#000",
+                          }}
+                          className="text-lg font-semibold line-clamp-1 max-w-72 pb-1"
+                        >
+                          {media.title.english ||
+                            media.title.romaji ||
+                            media.title.native}
+                        </Text>
+                        <Text
+                          style={{
+                            color: colorScheme === "dark" ? "#aaa" : "#4b5563",
+                          }}
+                          className="text-md max-w-72 line-clamp-1"
+                        >
+                          {media.genres.join(", ")}
+                        </Text>
+                      </View>
+                      <Octicons
+                        name="chevron-right"
+                        size={24}
+                        color={primaryOrange}
+                        className="ml-auto pr-5"
+                      />
+                    </View>
+                  );
+                }}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={1}
+                onEndReached={onReachEnd}
+                onEndReachedThreshold={0.5}
+              />
+            )}
+            <View className="flex flex-row justify-center h-6">
+              <Text style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}>
+                {""}
+              </Text>
+            </View>
           </View>
         )}
       </View>

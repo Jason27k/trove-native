@@ -1,11 +1,12 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View, Text, ScrollView, useColorScheme } from "react-native";
 import ThemedView from "@/components/ThemedView";
+import React from "react";
 
 const Liked = () => {
+  const colorScheme = useColorScheme();
   return (
     <ThemedView>
-      <Text>Liked</Text>
+      <View></View>
     </ThemedView>
   );
 };

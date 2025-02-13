@@ -42,6 +42,36 @@ export default function RootLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="upcoming"
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="trending"
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="top"
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
+        }}
+      />
     </Stack>
   );
 }

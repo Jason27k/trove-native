@@ -4,7 +4,10 @@ const ThemedView = ({ children }: { children: React.ReactNode }) => {
   const colorScheme = useColorScheme();
   return (
     <SafeAreaView
-      style={{ backgroundColor: colorScheme === "dark" ? "black" : "white" }}
+      style={{
+        backgroundColor: colorScheme === "dark" ? "black" : "white",
+        flex: 1,
+      }}
     >
       <View
         style={{

@@ -5,9 +5,9 @@ import { useColorScheme } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import { mainGray, primaryOrange } from "@/constants/Colors";
 import { animeSearch } from "@/api/api";
-import { useQuery } from "@tanstack/react-query";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
+import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
 
 const fetchUpcoming = async () => {
   let year = new Date().getFullYear();
@@ -40,9 +40,20 @@ const fetchUpcoming = async () => {
 const Search = () => {
   const colorScheme = useColorScheme();
 
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ["upcoming-anime"],
-    queryFn: fetchUpcoming,
+  const { data, isPending, error } = useInfiniteQuery({
+    queryKey: ["upcoming"],
+    queryFn: () => fetchUpcoming(),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.data.Page.pageInfo.hasNextPage) {
+        return pages.length + 1;
+      }
+    },
+    getPreviousPageParam: (firstPage, pages) => {
+      if (firstPage.data.Page.pageInfo.currentPage > 1) {
+        return pages.length - 1;
+      }
+    },
   });
 
   if (isPending) {
@@ -66,7 +77,7 @@ const Search = () => {
           <Octicons
             name="chevron-right"
             size={24}
-            color={colorScheme === "dark" ? "#fff" : "#000"}
+            color={colorScheme === "dark" ? primaryOrange : "#000"}
           />
         </View>
         <View className="flex flex-row justify-between pb-4">
@@ -137,22 +148,26 @@ const Search = () => {
             </Text>
           </View>
         </View>
-        <View className="flex flex-row justify-between pt-6 pb-2">
-          <Text
-            className="text-3xl font-semibold pb-4"
-            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-          >
-            Upcoming Anime
-          </Text>
-          <Octicons
-            name="chevron-right"
-            size={24}
-            color={colorScheme === "dark" ? "#fff" : "#000"}
-          />
+        <View className="flex flex-row justify-between pt-6 pb-4">
+          <Link href="/Search/upcoming">
+            <Text
+              className="text-3xl font-semibold pb-4"
+              style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+            >
+              Upcoming Anime
+            </Text>
+          </Link>
+          <Link href="/Search/upcoming">
+            <Octicons
+              name="chevron-right"
+              size={24}
+              color={colorScheme === "dark" ? primaryOrange : "#000"}
+            />
+          </Link>
         </View>
         <View>
           <FlatList
-            data={data.data.Page.media}
+            data={extractAndDeDuplicatedAnimes(data)}
             renderItem={(media) => (
               <View className="pr-4">
                 <Image

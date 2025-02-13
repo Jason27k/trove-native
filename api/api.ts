@@ -426,7 +426,7 @@ query ($page: Int = 1, $id: Int, $isAdult: Boolean = false, $search: String, $st
 
 // $page: Int = 1, $id: Int, $isAdult: Boolean = false, $search: String, $status: MediaStatus, $season: MediaSeason, $seasonYear: Int, $year: String, $genres: [String], $sort
 
-type SearchQueryVariables = {
+export type SearchQueryVariables = {
   page?: number;
   id?: number;
   isAdult?: boolean;
@@ -437,6 +437,11 @@ type SearchQueryVariables = {
   year?: string;
   genres?: string[];
   sort?: string[];
+};
+
+export const fetchSearch = async (variables: SearchQueryVariables) => {
+  const response = await animeSearch(variables);
+  return response;
 };
 
 export async function animeSearch(
@@ -458,12 +463,13 @@ export async function animeSearch(
       variables,
     }),
   });
+  console.log(response.status);
   let json: SearchQueryResponse = await response.json();
+  console.log(variables);
 
   const deduplicatedAnimes = Array.from(
     new Map(json.data.Page.media.map((anime) => [anime.id, anime])).values()
   );
-
   const uniqueSet = new Set(uniqueIds);
   if (uniqueIds) {
     json.data.Page.media = deduplicatedAnimes.filter(

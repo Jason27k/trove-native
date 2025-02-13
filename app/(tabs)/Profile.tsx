@@ -1,11 +1,11 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View } from "react-native";
 import ThemedView from "@/components/ThemedView";
+import React from "react";
 
 const Profile = () => {
   return (
     <ThemedView>
-      <Text>Profile</Text>
+      <View></View>
     </ThemedView>
   );
 };
