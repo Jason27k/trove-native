@@ -26,6 +26,7 @@ const upcoming = () => {
       <DataList
         queryKey="upcoming"
         variables={{ seasonYear: nextSeasonYear, season: nextSeason }}
+        title="Upcoming"
       />
     </ThemedView>
   );

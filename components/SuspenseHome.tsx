@@ -24,21 +24,7 @@ const SuspenseHome = ({ colorScheme }: { colorScheme: ColorSchemeName }) => {
           />
         </View>
       </View>
-      <View>
-        <FlatList
-          data={[...Array(10)]}
-          renderItem={() => (
-            <View className="pr-2">
-              <Text
-                style={{ width: 120, height: 210 }}
-                className="rounded-2xl bg-gray-200 dark:bg-gray-700"
-              />
-            </View>
-          )}
-          keyExtractor={(_, index) => index.toString()}
-          horizontal={true}
-        />
-      </View>
+      <HorizontalList />
       <View className="flex flex-row justify-between py-4">
         <View className="pb-2">
           <Text
@@ -56,24 +42,25 @@ const SuspenseHome = ({ colorScheme }: { colorScheme: ColorSchemeName }) => {
           />
         </View>
       </View>
-      <View>
-        {[...Array(10)].map((_, index) => (
-          <View
-            style={{ backgroundColor: secondaryOrange }}
-            className="rounded-3xl flex flex-row mb-3"
-            key={index.toString()}
-          >
-            <Text
-              style={{ width: 75, height: 100 }}
-              className="rounded-full object-none my-2 mx-3 bg-gray-200 dark:bg-gray-700"
-            />
-            <View className="pl-3 pb-4 flex flex-col justify-center">
-              <Text className="rounded-full text-lg font-semibold text-black line-clamp-1 w-64 bg-gray-200 dark:bg-gray-700 h-12"></Text>
-            </View>
-          </View>
-        ))}
-      </View>
+      <HorizontalList />
     </ThemedView>
+  );
+};
+
+const HorizontalList = () => {
+  return (
+    <FlatList
+      data={[...Array(10)]}
+      renderItem={(media) => (
+        <View className="w-[42vw] pr-4">
+          <Text className="w-full aspect-[2/3] rounded-lg bg-gray-200 dark:bg-gray-700 mb-2" />
+          <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 bg-gray-200 dark:bg-gray-700"></Text>
+        </View>
+      )}
+      keyExtractor={(_, index) => index.toString()}
+      horizontal={true}
+      showsHorizontalScrollIndicator={false}
+    />
   );
 };
 

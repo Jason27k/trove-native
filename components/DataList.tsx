@@ -22,9 +22,10 @@ import { MediaDisplay } from "@/api/model";
 interface DataListProps {
   queryKey: string;
   variables: SearchQueryVariables;
+  title?: string;
 }
 
-const DataList: React.FC<DataListProps> = ({ queryKey, variables }) => {
+const DataList: React.FC<DataListProps> = ({ queryKey, variables, title }) => {
   const [showGrid, setShowGrid] = useState(true);
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
@@ -92,6 +93,14 @@ const DataList: React.FC<DataListProps> = ({ queryKey, variables }) => {
       }
     >
       <View>
+        {title && (
+          <Text
+            className="text-3xl font-semibold pb-4"
+            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+          >
+            {title}
+          </Text>
+        )}
         {showGrid ? (
           <FlatList
             key="grid"
@@ -162,7 +171,7 @@ const DataList: React.FC<DataListProps> = ({ queryKey, variables }) => {
   );
 };
 
-const GridItem = ({
+export const GridItem = ({
   media,
   colorScheme,
 }: {

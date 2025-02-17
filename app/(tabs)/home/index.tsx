@@ -76,6 +76,7 @@ export default function Index() {
     sort: ["SCORE_DESC"],
     page: 1,
   };
+
   const {
     data: topData,
     isPending: topPending,
@@ -173,7 +174,7 @@ export default function Index() {
             colorScheme={colorScheme}
           />
           <View className="flex flex-row justify-between pt-6 pb-4">
-            <Link href="/Search/upcoming">
+            <Link href="/home/upcoming">
               <Text
                 className="text-3xl font-semibold pb-4"
                 style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
@@ -181,7 +182,7 @@ export default function Index() {
                 Upcoming Anime
               </Text>
             </Link>
-            <Link href="/Search/upcoming">
+            <Link href="/home/upcoming">
               <Octicons
                 name="chevron-right"
                 size={24}

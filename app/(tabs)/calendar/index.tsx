@@ -4,10 +4,9 @@ import {
   useColorScheme,
   ScrollView,
   Pressable,
-  FlatList,
 } from "react-native";
 import ThemedView from "@/components/ThemedView";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { convertUTCToLocal, getWeekRangeFromToday } from "@/lib/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchSchedule } from "@/api/api";
