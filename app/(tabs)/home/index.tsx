@@ -1,13 +1,50 @@
-import { FlatList, Image, Text, useColorScheme, View } from "react-native";
+import {
+  ColorSchemeName,
+  FlatList,
+  Image,
+  ScrollView,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import ThemedView from "@/components/ThemedView";
-import { fetchSearch, SearchQueryVariables } from "@/api/api";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { primaryOrange, secondaryOrange } from "@/constants/Colors";
+import { animeSearch, fetchSearch, SearchQueryVariables } from "@/api/api";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { mainGray, primaryOrange, secondaryOrange } from "@/constants/Colors";
 import { Link } from "expo-router";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
 import SuspenseHome from "@/components/SuspenseHome";
 import { Suspense } from "react";
+import { MediaDisplay } from "@/api/model";
+
+const fetchUpcoming = async () => {
+  let year = new Date().getFullYear();
+  let nextSeasonYear = year;
+  const month = new Date().getMonth();
+  let nextSeason: "WINTER" | "SPRING" | "SUMMER" | "FALL" = "WINTER";
+  let currentSeason: "WINTER" | "SPRING" | "SUMMER" | "FALL" = "FALL";
+
+  if (month >= 0 && month < 3) {
+    nextSeason = "SPRING";
+    currentSeason = "WINTER";
+  } else if (month >= 3 && month < 6) {
+    nextSeason = "SUMMER";
+    currentSeason = "SPRING";
+  } else if (month >= 6 && month < 9) {
+    nextSeason = "FALL";
+    currentSeason = "SUMMER";
+  } else {
+    nextSeasonYear += 1;
+  }
+  const response = await animeSearch({
+    seasonYear: nextSeasonYear,
+    season: nextSeason,
+    page: 1,
+  });
+
+  return response;
+};
 
 export default function Index() {
   const colorScheme = useColorScheme();
@@ -61,106 +98,144 @@ export default function Index() {
     },
   });
 
-  if (isPending || topPending) {
+  const {
+    data: upcomingData,
+    isPending: upcomingPending,
+    error: upcomingError,
+  } = useInfiniteQuery({
+    queryKey: ["upcoming"],
+    queryFn: () => fetchUpcoming(),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.data.Page.pageInfo.hasNextPage) {
+        return pages.length + 1;
+      }
+    },
+    getPreviousPageParam: (firstPage, pages) => {
+      if (firstPage.data.Page.pageInfo.currentPage > 1) {
+        return pages.length - 1;
+      }
+    },
+  });
+
+  if (isPending || topPending || upcomingPending) {
     return <SuspenseHome colorScheme={colorScheme} />;
   }
 
-  if (error || topError) {
+  if (error || topError || upcomingError) {
     return <Text>Error</Text>;
   }
 
   return (
     <ThemedView>
       <Suspense fallback={<SuspenseHome colorScheme={colorScheme} />}>
-        <View className="flex flex-row justify-between">
-          <Link href="/home/trending" className="pb-4">
-            <Text
-              className="text-3xl font-semibold"
-              style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-            >
-              Featured Anime
-            </Text>
-          </Link>
-          <Link href="/home/trending">
-            <Octicons
-              name="chevron-right"
-              size={24}
-              color={colorScheme === "dark" ? primaryOrange : "#000"}
-            />
-          </Link>
-        </View>
-        <View>
-          <FlatList
-            data={extractAndDeDuplicatedAnimes(data)}
-            renderItem={(media) => (
-              <View className="pr-2">
-                <Image
-                  style={{ width: 120, height: 210 }}
-                  className="rounded-2xl"
-                  source={{
-                    uri: media.item.coverImage.extraLarge,
-                  }}
-                />
-              </View>
-            )}
-            keyExtractor={(item) => item.idMal.toString()}
-            horizontal={true}
-          />
-        </View>
-        <View className="flex flex-row justify-between py-4">
-          <Link push href="/home/top" className="pb-2">
-            <Text
-              className="text-3xl font-semibold"
-              style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-            >
-              All Time Popular
-            </Text>
-          </Link>
-          <Link href="/home/top">
-            <Octicons
-              name="chevron-right"
-              size={24}
-              color={colorScheme === "dark" ? primaryOrange : "#000"}
-            />
-          </Link>
-        </View>
-        <View>
-          {extractAndDeDuplicatedAnimes(topData)
-            .slice(0, 3)
-            .map((media) => (
-              <View
-                style={{ backgroundColor: secondaryOrange }}
-                className="rounded-3xl flex flex-row mb-3"
-                key={media.id}
+        <ScrollView>
+          <View className="flex flex-row justify-between">
+            <Link href="/home/trending" className="pb-4">
+              <Text
+                className="text-3xl font-semibold"
+                style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
               >
-                <Image
-                  source={{
-                    uri: media.coverImage.extraLarge,
-                  }}
-                  style={{ width: 75, height: 100 }}
-                  className="rounded-full object-none my-2 mx-3"
-                />
-                <View className="pl-3 pb-4 flex flex-col justify-center">
-                  <Text className="text-lg font-semibold text-black line-clamp-1 max-w-64">
-                    {media.title.english ?? media.title.native}
-                  </Text>
-                  <Text className="text-black text-md">
-                    Episodes: {media.episodes}
-                  </Text>
-                  {media.averageScore ? (
-                    <Text className="text-black text-md">
-                      Rating: {media.averageScore / 10}
-                    </Text>
-                  ) : (
-                    <Text className="text-black text-md">
-                      {media.season} {media.seasonYear}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            ))}
-        </View>
+                Featured Anime
+              </Text>
+            </Link>
+            <Link href="/home/trending">
+              <Octicons
+                name="chevron-right"
+                size={24}
+                color={colorScheme === "dark" ? primaryOrange : "#000"}
+              />
+            </Link>
+          </View>
+          <HorizontalList
+            data={extractAndDeDuplicatedAnimes(data)}
+            colorScheme={colorScheme}
+          />
+          <View className="flex flex-row justify-between py-4">
+            <Link push href="/home/top" className="pb-2">
+              <Text
+                className="text-3xl font-semibold"
+                style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+              >
+                All Time Popular
+              </Text>
+            </Link>
+            <Link href="/home/top">
+              <Octicons
+                name="chevron-right"
+                size={24}
+                color={colorScheme === "dark" ? primaryOrange : "#000"}
+              />
+            </Link>
+          </View>
+          <HorizontalList
+            data={extractAndDeDuplicatedAnimes(topData)}
+            colorScheme={colorScheme}
+          />
+          <View className="flex flex-row justify-between pt-6 pb-4">
+            <Link href="/Search/upcoming">
+              <Text
+                className="text-3xl font-semibold pb-4"
+                style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+              >
+                Upcoming Anime
+              </Text>
+            </Link>
+            <Link href="/Search/upcoming">
+              <Octicons
+                name="chevron-right"
+                size={24}
+                color={colorScheme === "dark" ? primaryOrange : "#000"}
+              />
+            </Link>
+          </View>
+          <HorizontalList
+            data={extractAndDeDuplicatedAnimes(upcomingData)}
+            colorScheme={colorScheme}
+          />
+        </ScrollView>
       </Suspense>
     </ThemedView>
   );
 }
+
+const HorizontalList = ({
+  data,
+  colorScheme,
+}: {
+  data: MediaDisplay[];
+  colorScheme: ColorSchemeName;
+}) => {
+  return (
+    <FlatList
+      data={data}
+      renderItem={(media) => (
+        <View className="w-[42vw] pr-4">
+          <Image
+            className="w-full aspect-[2/3] rounded-lg"
+            source={{
+              uri: media.item.coverImage.extraLarge,
+            }}
+          />
+          <Text
+            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+            className="text-lg font-semibold pt-2 text-center line-clamp-1"
+          >
+            {media.item.title.english || media.item.title.native}
+          </Text>
+          <Text
+            style={{
+              color: colorScheme === "dark" ? mainGray : "#4b5563",
+            }}
+            className="text-md text-center pb-2 line-clamp-2"
+          >
+            {media.item.description.replace(/<[^>]*>/g, "")}
+          </Text>
+        </View>
+      )}
+      keyExtractor={(item) => item.idMal.toString()}
+      horizontal={true}
+      showsHorizontalScrollIndicator={false}
+    />
+  );
+};

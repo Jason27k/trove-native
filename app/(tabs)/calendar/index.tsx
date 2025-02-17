@@ -15,7 +15,6 @@ import CalendarDataList from "@/components/CalendarDataList";
 import { useNavigation } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { mainGray, primaryOrange } from "@/constants/Colors";
-import DataList from "@/components/DataList";
 import SuspenseDataList from "@/components/SuspenseDataList";
 
 const MIN_MEMBERS = 2000;
@@ -80,7 +79,7 @@ const Calendar = () => {
     "Saturday",
   ];
 
-  if (isFetching || isPending) {
+  if (isFetching || isPending || hasNextPage) {
     return (
       <ThemedView>
         <View className="flex flex-col">
@@ -117,13 +116,7 @@ const Calendar = () => {
             ))}
           </ScrollView>
         </View>
-        <FlatList
-          data={Array.from({ length: 10 })}
-          renderItem={() => (
-            <SuspenseDataList showGrid={showGrid} colorScheme={colorScheme} />
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
+        <SuspenseDataList showGrid={showGrid} colorScheme={colorScheme} />
       </ThemedView>
     );
   }

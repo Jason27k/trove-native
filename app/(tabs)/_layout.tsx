@@ -16,6 +16,7 @@ export default function RootLayout() {
         tabBarInactiveTintColor: colorScheme === "dark" ? mainGray : "#000",
         tabBarStyle: {
           backgroundColor: colorScheme === "dark" ? tabGray : mainGray,
+          borderColor: colorScheme === "dark" ? tabGray : mainGray,
         },
       }}
     >

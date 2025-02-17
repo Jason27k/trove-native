@@ -37,3 +37,32 @@ export function getWeekRangeFromToday(): {
     endOfWeek: Math.floor(endOfWeek.getTime() / 1000),
   };
 }
+
+export function getDailyRangeFromOffset(dayOffset: number) {
+  const startOfDay = new Date();
+  startOfDay.setDate(startOfDay.getDate() + dayOffset);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  return {
+    startOfDay: Math.floor(startOfDay.getTime() / 1000),
+    endOfDay: Math.floor(endOfDay.getTime() / 1000),
+  };
+}
+
+export const getDaysOfWeek = () => {
+  const today = new Date();
+  const days = [];
+  for (let i = 1; i <= 6; i++) {
+    const startOfDay = new Date(today);
+    startOfDay.setDate(today.getDate() + i);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    days.push({ start: startOfDay, end: endOfDay });
+  }
+  return days;
+};
