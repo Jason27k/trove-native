@@ -240,6 +240,7 @@ export type CalendarQueryResponse = {
 
 export type PageInfo = {
   hasNextPage: boolean;
+  currentPage: number;
   total: number;
 };
 

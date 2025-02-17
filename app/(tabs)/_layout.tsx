@@ -48,9 +48,14 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="Calendar"
+        name="calendar"
         options={{
+          title: "Calendar",
           headerShown: false,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
           tabBarIcon: ({ color }) => (
             <AntDesign name="calendar" size={24} color={color} />
           ),
@@ -59,7 +64,11 @@ export default function RootLayout() {
       <Tabs.Screen
         name="Profile"
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
           tabBarIcon: ({ color }) => (
             <FontAwesome name="user-circle" size={24} color={color} />
           ),

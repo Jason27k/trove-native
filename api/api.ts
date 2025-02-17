@@ -264,6 +264,7 @@ query ($weekStart: Int, $weekEnd: Int, $page: Int) {
   Page(page: $page) {
     pageInfo {
       hasNextPage
+      currentPage
       total
     }
     airingSchedules(airingAt_greater: $weekStart, airingAt_lesser: $weekEnd) {
@@ -347,12 +348,6 @@ export const fetchSchedule = async (
     }),
   });
   let json: CalendarQueryResponse = await response.json();
-  const deduplicatedAnimes = Array.from(
-    new Map(
-      json.data.Page.airingSchedules.map((anime) => [anime.id, anime])
-    ).values()
-  );
-  json.data.Page.airingSchedules = deduplicatedAnimes;
   return json;
 };
 

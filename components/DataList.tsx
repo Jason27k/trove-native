@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import {
   View,
   Text,
   FlatList,
   Image,
   useColorScheme,
-  StyleSheet,
   Pressable,
+  ColorSchemeName,
 } from "react-native";
 import { useNavigation } from "expo-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -16,6 +16,8 @@ import { mainGray, primaryOrange, tabGray } from "@/constants/Colors";
 import { SearchQueryVariables } from "@/api/api";
 import { fetchSearch } from "@/api/api";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
+import SuspenseDataList from "./SuspenseDataList";
+import { MediaDisplay } from "@/api/model";
 
 interface DataListProps {
   queryKey: string;
@@ -80,113 +82,115 @@ const DataList: React.FC<DataListProps> = ({ queryKey, variables }) => {
   }
 
   if (!data || !data.pages) {
-    return <Text>Loading...</Text>;
+    return <SuspenseDataList showGrid={showGrid} colorScheme={colorScheme} />;
   }
 
   return (
-    <View>
-      {showGrid ? (
-        <FlatList
-          key="grid"
-          className="h-full"
-          data={extractAndDeDuplicatedAnimes(data)}
-          renderItem={({ item: media }) => (
-            <View className="w-1/2 p-2 h-full">
-              <View className="flex flex-col items-center">
+    <Suspense
+      fallback={
+        <SuspenseDataList showGrid={showGrid} colorScheme={colorScheme} />
+      }
+    >
+      <View>
+        {showGrid ? (
+          <FlatList
+            key="grid"
+            data={extractAndDeDuplicatedAnimes(data)}
+            renderItem={({ item: media }) => (
+              <GridItem media={media} colorScheme={colorScheme} />
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            onEndReached={onReachEnd}
+            onEndReachedThreshold={0.5}
+          />
+        ) : (
+          <FlatList
+            key="list"
+            className="h-full first:rounded-t-xl last:rounded-b-xl"
+            data={extractAndDeDuplicatedAnimes(data)}
+            renderItem={({ item: media }) => (
+              <View
+                className="flex flex-row items-center border-b-[1px]"
+                style={{
+                  borderColor: colorScheme === "dark" ? "black" : "white",
+                  backgroundColor: colorScheme === "dark" ? tabGray : mainGray,
+                }}
+              >
                 <Image
-                  style={{ width: 170, height: 255 }}
+                  width={80}
+                  height={120}
                   source={{ uri: media.coverImage.extraLarge }}
+                  className="pl-3 py-3"
                 />
-                <Text
-                  style={{
-                    color: colorScheme === "dark" ? "#fff" : "#000",
-                  }}
-                  className="text-lg font-semibold pt-2 text-center max-w-[170px] line-clamp-1"
-                >
-                  {media.title.english || media.title.native}
-                </Text>
-                <Text
-                  style={{
-                    color: colorScheme === "dark" ? "#aaa" : "#4b5563",
-                  }}
-                  className="text-md text-center pb-2 line-clamp-2 max-w-[170px]"
-                >
-                  {media.description
-                    ? media.description.replace(/<[^>]*>/g, "")
-                    : ""}
-                </Text>
+                <View className="pl-3 pb-2">
+                  <Text
+                    style={{
+                      color: colorScheme === "dark" ? "#fff" : "#000",
+                    }}
+                    className="text-lg font-semibold line-clamp-1 max-w-72 pb-1"
+                  >
+                    {media.title.english ||
+                      media.title.romaji ||
+                      media.title.native}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colorScheme === "dark" ? "#aaa" : "#4b5563",
+                    }}
+                    className="text-md max-w-72 line-clamp-1"
+                  >
+                    {media.genres.join(", ")}
+                  </Text>
+                </View>
+                <Octicons
+                  name="chevron-right"
+                  size={24}
+                  color={primaryOrange}
+                  className="ml-auto pr-5"
+                />
               </View>
-            </View>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.gridContainer}
-          onEndReached={onReachEnd}
-          onEndReachedThreshold={0.5}
-        />
-      ) : (
-        <FlatList
-          key="list"
-          className="h-full first:rounded-t-xl last:rounded-b-xl"
-          data={extractAndDeDuplicatedAnimes(data)}
-          renderItem={({ item: media }) => (
-            <View
-              className="flex flex-row items-center border-b-[1px]"
-              style={{
-                borderColor: colorScheme === "dark" ? "black" : "white",
-                backgroundColor: colorScheme === "dark" ? tabGray : mainGray,
-              }}
-            >
-              <Image
-                width={80}
-                height={120}
-                source={{ uri: media.coverImage.extraLarge }}
-                className="pl-3 py-3"
-              />
-              <View className="pl-3 pb-2">
-                <Text
-                  style={{
-                    color: colorScheme === "dark" ? "#fff" : "#000",
-                  }}
-                  className="text-lg font-semibold line-clamp-1 max-w-72 pb-1"
-                >
-                  {media.title.english ||
-                    media.title.romaji ||
-                    media.title.native}
-                </Text>
-                <Text
-                  style={{
-                    color: colorScheme === "dark" ? "#aaa" : "#4b5563",
-                  }}
-                  className="text-md max-w-72 line-clamp-1"
-                >
-                  {media.genres.join(", ")}
-                </Text>
-              </View>
-              <Octicons
-                name="chevron-right"
-                size={24}
-                color={primaryOrange}
-                className="ml-auto pr-5"
-              />
-            </View>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={1}
-          onEndReached={onReachEnd}
-          onEndReachedThreshold={0.5}
-        />
-      )}
-    </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={1}
+            onEndReached={onReachEnd}
+            onEndReachedThreshold={0.5}
+          />
+        )}
+      </View>
+    </Suspense>
   );
 };
 
-const styles = StyleSheet.create({
-  gridContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-});
+const GridItem = ({
+  media,
+  colorScheme,
+}: {
+  media: MediaDisplay;
+  colorScheme: ColorSchemeName;
+}) => {
+  return (
+    <View className="flex-1 p-2 max-w-[50%]">
+      <Image
+        className="w-full aspect-[2/3] rounded-lg"
+        source={{ uri: media.coverImage.extraLarge }}
+      />
+      <Text
+        className={`text-lg font-semibold pt-2 text-center line-clamp-1 ${
+          colorScheme === "dark" ? "text-white" : "text-black"
+        }`}
+      >
+        {media.title.english || media.title.romaji || media.title.native}
+      </Text>
+      <Text
+        className={`text-md text-center pb-2 line-clamp-2 ${
+          colorScheme === "dark" ? "text-gray-400" : "text-gray-600"
+        }`}
+      >
+        {media.description ? media.description.replace(/<[^>]*>/g, "") : ""}
+      </Text>
+    </View>
+  );
+};
 
 export default DataList;
