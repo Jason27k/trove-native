@@ -8,6 +8,7 @@ const upcoming = () => {
         queryKey="trending"
         variables={{ sort: ["TRENDING_DESC"] }}
         title="Featured Anime"
+        stepsBack={2}
       />
     </ThemedView>
   );

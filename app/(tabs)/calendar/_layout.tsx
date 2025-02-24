@@ -16,6 +16,16 @@ const _layout = () => {
           },
         }}
       />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
+        }}
+      />
     </Stack>
   );
 };

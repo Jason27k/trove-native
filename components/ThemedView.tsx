@@ -8,6 +8,7 @@ const ThemedView = ({ children }: { children: React.ReactNode }) => {
         backgroundColor: colorScheme === "dark" ? "black" : "white",
         flex: 1,
       }}
+      className="relative"
     >
       <View
         style={{

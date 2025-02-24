@@ -27,6 +27,7 @@ const upcoming = () => {
         queryKey="upcoming"
         variables={{ seasonYear: nextSeasonYear, season: nextSeason }}
         title="Upcoming"
+        stepsBack={2}
       />
     </ThemedView>
   );

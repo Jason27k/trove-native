@@ -73,7 +73,7 @@ const Search = () => {
         key="grid"
         data={extractAndDeDuplicatedAnimes(data)}
         renderItem={({ item: media }) => (
-          <GridItem media={media} colorScheme={colorScheme} />
+          <GridItem media={media} colorScheme={colorScheme} stepsBack={1} />
         )}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}

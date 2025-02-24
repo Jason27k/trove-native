@@ -7,7 +7,6 @@ import {
   FlatList,
   Pressable,
   Image,
-  ScrollView,
   ColorSchemeName,
 } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -17,8 +16,7 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { animeSearch } from "@/api/api";
-import { StyleSheet } from "react-native";
-import { useNavigation } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
 import { MediaDisplay } from "@/api/model";
@@ -245,47 +243,51 @@ const Search = () => {
                 data={extractAndDeDuplicatedAnimes(data)}
                 renderItem={({ item: media }) => {
                   return (
-                    <View
-                      className="flex flex-row items-center border-b-[1px]"
-                      style={{
-                        borderColor: colorScheme === "dark" ? "black" : "white",
-                        backgroundColor:
-                          colorScheme === "dark" ? tabGray : mainGray,
-                      }}
-                    >
-                      <Image
-                        width={80}
-                        height={120}
-                        source={{ uri: media.coverImage.extraLarge }}
-                        className="pl-3 py-3"
-                      />
-                      <View className="pl-3 pb-2">
-                        <Text
-                          style={{
-                            color: colorScheme === "dark" ? "#fff" : "#000",
-                          }}
-                          className="text-lg font-semibold line-clamp-1 max-w-72 pb-1"
-                        >
-                          {media.title.english ||
-                            media.title.romaji ||
-                            media.title.native}
-                        </Text>
-                        <Text
-                          style={{
-                            color: colorScheme === "dark" ? "#aaa" : "#4b5563",
-                          }}
-                          className="text-md max-w-72 line-clamp-1"
-                        >
-                          {media.genres.join(", ")}
-                        </Text>
-                      </View>
-                      <Octicons
-                        name="chevron-right"
-                        size={24}
-                        color={primaryOrange}
-                        className="ml-auto pr-5"
-                      />
-                    </View>
+                    <Link href={`../${media.id}`} asChild relativeToDirectory>
+                      <Pressable
+                        className="flex flex-row items-center border-b-[1px]"
+                        style={{
+                          borderColor:
+                            colorScheme === "dark" ? "black" : "white",
+                          backgroundColor:
+                            colorScheme === "dark" ? tabGray : mainGray,
+                        }}
+                      >
+                        <Image
+                          width={80}
+                          height={120}
+                          source={{ uri: media.coverImage.extraLarge }}
+                          className="pl-3 py-3"
+                        />
+                        <View className="pl-3 pb-2">
+                          <Text
+                            style={{
+                              color: colorScheme === "dark" ? "#fff" : "#000",
+                            }}
+                            className="text-lg font-semibold line-clamp-1 max-w-72 pb-1"
+                          >
+                            {media.title.english ||
+                              media.title.romaji ||
+                              media.title.native}
+                          </Text>
+                          <Text
+                            style={{
+                              color:
+                                colorScheme === "dark" ? "#aaa" : "#4b5563",
+                            }}
+                            className="text-md max-w-72 line-clamp-1"
+                          >
+                            {media.genres.join(", ")}
+                          </Text>
+                        </View>
+                        <Octicons
+                          name="chevron-right"
+                          size={24}
+                          color={primaryOrange}
+                          className="ml-auto pr-5"
+                        />
+                      </Pressable>
+                    </Link>
                   );
                 }}
                 keyExtractor={(item) => item.id.toString()}
@@ -314,26 +316,28 @@ const GridItem = ({
   colorScheme: ColorSchemeName;
 }) => {
   return (
-    <View className="flex-1 p-2 max-w-[50%]">
-      <Image
-        className="w-full aspect-[2/3] rounded-lg"
-        source={{ uri: media.coverImage.extraLarge }}
-      />
-      <Text
-        className={`text-lg font-semibold pt-2 text-center line-clamp-1 ${
-          colorScheme === "dark" ? "text-white" : "text-black"
-        }`}
-      >
-        {media.title.english || media.title.romaji || media.title.native}
-      </Text>
-      <Text
-        className={`text-md text-center pb-2 line-clamp-2 ${
-          colorScheme === "dark" ? "text-gray-400" : "text-gray-600"
-        }`}
-      >
-        {media.description ? media.description.replace(/<[^>]*>/g, "") : ""}
-      </Text>
-    </View>
+    <Link href={`../${media.id}`} asChild relativeToDirectory>
+      <Pressable className="flex-1 p-2 max-w-[50%]">
+        <Image
+          className="w-full aspect-[2/3] rounded-lg"
+          source={{ uri: media.coverImage.extraLarge }}
+        />
+        <Text
+          className={`text-lg font-semibold pt-2 text-center line-clamp-1 ${
+            colorScheme === "dark" ? "text-white" : "text-black"
+          }`}
+        >
+          {media.title.english || media.title.romaji || media.title.native}
+        </Text>
+        <Text
+          className={`text-md text-center pb-2 line-clamp-2 ${
+            colorScheme === "dark" ? "text-gray-400" : "text-gray-600"
+          }`}
+        >
+          {media.description ? media.description.replace(/<[^>]*>/g, "") : ""}
+        </Text>
+      </Pressable>
+    </Link>
   );
 };
 export default Search;

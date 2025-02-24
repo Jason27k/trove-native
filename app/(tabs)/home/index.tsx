@@ -2,6 +2,7 @@ import {
   ColorSchemeName,
   FlatList,
   Image,
+  Pressable,
   ScrollView,
   Text,
   useColorScheme,
@@ -132,20 +133,24 @@ export default function Index() {
       <Suspense fallback={<SuspenseHome colorScheme={colorScheme} />}>
         <ScrollView>
           <View className="flex flex-row justify-between">
-            <Link href="/home/trending" className="pb-4">
-              <Text
-                className="text-3xl font-semibold"
-                style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-              >
-                Featured Anime
-              </Text>
+            <Link href="/home/trending" asChild>
+              <Pressable className="pb-4">
+                <Text
+                  className="text-3xl font-semibold"
+                  style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+                >
+                  Featured Anime
+                </Text>
+              </Pressable>
             </Link>
-            <Link href="/home/trending">
-              <Octicons
-                name="chevron-right"
-                size={24}
-                color={colorScheme === "dark" ? primaryOrange : "#000"}
-              />
+            <Link href="/home/trending" asChild>
+              <Pressable>
+                <Octicons
+                  name="chevron-right"
+                  size={24}
+                  color={colorScheme === "dark" ? primaryOrange : "#000"}
+                />
+              </Pressable>
             </Link>
           </View>
           <HorizontalList
@@ -153,20 +158,24 @@ export default function Index() {
             colorScheme={colorScheme}
           />
           <View className="flex flex-row justify-between py-4">
-            <Link push href="/home/top" className="pb-2">
-              <Text
-                className="text-3xl font-semibold"
-                style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-              >
-                All Time Popular
-              </Text>
+            <Link push href="/home/top" asChild>
+              <Pressable className="pb-2">
+                <Text
+                  className="text-3xl font-semibold"
+                  style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+                >
+                  All Time Popular
+                </Text>
+              </Pressable>
             </Link>
-            <Link href="/home/top">
-              <Octicons
-                name="chevron-right"
-                size={24}
-                color={colorScheme === "dark" ? primaryOrange : "#000"}
-              />
+            <Link href="/home/top" asChild>
+              <Pressable>
+                <Octicons
+                  name="chevron-right"
+                  size={24}
+                  color={colorScheme === "dark" ? primaryOrange : "#000"}
+                />
+              </Pressable>
             </Link>
           </View>
           <HorizontalList
@@ -174,20 +183,24 @@ export default function Index() {
             colorScheme={colorScheme}
           />
           <View className="flex flex-row justify-between pt-6 pb-4">
-            <Link href="/home/upcoming">
-              <Text
-                className="text-3xl font-semibold pb-4"
-                style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-              >
-                Upcoming Anime
-              </Text>
+            <Link href="/home/upcoming" asChild>
+              <Pressable>
+                <Text
+                  className="text-3xl font-semibold pb-4"
+                  style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+                >
+                  Upcoming Anime
+                </Text>
+              </Pressable>
             </Link>
-            <Link href="/home/upcoming">
-              <Octicons
-                name="chevron-right"
-                size={24}
-                color={colorScheme === "dark" ? primaryOrange : "#000"}
-              />
+            <Link href="/home/upcoming" asChild>
+              <Pressable>
+                <Octicons
+                  name="chevron-right"
+                  size={24}
+                  color={colorScheme === "dark" ? primaryOrange : "#000"}
+                />
+              </Pressable>
             </Link>
           </View>
           <HorizontalList
@@ -211,28 +224,30 @@ const HorizontalList = ({
     <FlatList
       data={data}
       renderItem={(media) => (
-        <View className="w-[42vw] pr-4">
-          <Image
-            className="w-full aspect-[2/3] rounded-lg"
-            source={{
-              uri: media.item.coverImage.extraLarge,
-            }}
-          />
-          <Text
-            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-            className="text-lg font-semibold pt-2 text-center line-clamp-1"
-          >
-            {media.item.title.english || media.item.title.native}
-          </Text>
-          <Text
-            style={{
-              color: colorScheme === "dark" ? mainGray : "#4b5563",
-            }}
-            className="text-md text-center pb-2 line-clamp-2"
-          >
-            {media.item.description.replace(/<[^>]*>/g, "")}
-          </Text>
-        </View>
+        <Link href={`./${media.item.id}`} asChild relativeToDirectory>
+          <Pressable className="w-[42vw] pr-4">
+            <Image
+              className="w-full aspect-[2/3] rounded-lg"
+              source={{
+                uri: media.item.coverImage.extraLarge,
+              }}
+            />
+            <Text
+              style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+              className="text-lg font-semibold pt-2 text-center line-clamp-1"
+            >
+              {media.item.title.english || media.item.title.native}
+            </Text>
+            <Text
+              style={{
+                color: colorScheme === "dark" ? mainGray : "#4b5563",
+              }}
+              className="text-md text-center pb-2 line-clamp-2"
+            >
+              {media.item.description.replace(/<[^>]*>/g, "")}
+            </Text>
+          </Pressable>
+        </Link>
       )}
       keyExtractor={(item) => item.idMal.toString()}
       horizontal={true}

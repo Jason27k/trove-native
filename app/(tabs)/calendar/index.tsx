@@ -20,11 +20,12 @@ const MIN_MEMBERS = 2000;
 
 const Calendar = () => {
   const offset = new Date().getDay();
-  const [currentDay, setCurrentDay] = useState(new Date().getDay() + offset);
+  const [currentDay, setCurrentDay] = useState(offset);
   const colorScheme = useColorScheme();
   const [showGrid, setShowGrid] = useState(true);
   const navigation = useNavigation();
   const { startOfWeek, endOfWeek } = getWeekRangeFromToday();
+  console.log(startOfWeek, endOfWeek);
 
   const { data, error, fetchNextPage, hasNextPage, isFetching, isPending } =
     useInfiniteQuery({
@@ -33,12 +34,20 @@ const Calendar = () => {
         fetchSchedule(startOfWeek, endOfWeek, pageParam),
       initialPageParam: 1,
       getNextPageParam: (lastPage, pages) => {
-        if (lastPage.data.Page.pageInfo.hasNextPage) {
+        if (
+          lastPage &&
+          lastPage.data &&
+          lastPage.data.Page.pageInfo.hasNextPage
+        ) {
           return pages.length + 1;
         }
       },
       getPreviousPageParam: (firstPage, pages) => {
-        if (firstPage.data.Page.pageInfo.currentPage > 1) {
+        if (
+          firstPage &&
+          firstPage.data &&
+          firstPage.data.Page.pageInfo.currentPage > 1
+        ) {
           return pages.length - 1;
         }
       },
@@ -86,7 +95,7 @@ const Calendar = () => {
             className="text-3xl font-semibold pb-1 pl-2"
             style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
           >
-            {days[currentDay % 7]}
+            {days[currentDay]}
           </Text>
 
           <ScrollView
@@ -94,22 +103,25 @@ const Calendar = () => {
             showsHorizontalScrollIndicator={false}
             className="ml-2 py-4"
           >
-            {days.map((day, index) => (
+            {days.map((_, index) => (
               <Pressable
                 key={index}
-                onPress={() => setCurrentDay(index)}
                 style={{
                   backgroundColor:
-                    currentDay % 7 === index ? primaryOrange : mainGray,
+                    currentDay === (index + offset) % 7
+                      ? primaryOrange
+                      : mainGray,
                 }}
                 className={`px-4 py-2 mr-3 rounded-lg`}
               >
                 <Text
                   className={`text-lg font-medium ${
-                    currentDay % 7 === index ? "text-white" : "text-black"
+                    currentDay === (index + offset) % 7
+                      ? "text-white"
+                      : "text-black"
                   }`}
                 >
-                  {day}
+                  {days[(index + offset) % 7]}
                 </Text>
               </Pressable>
             ))}
@@ -131,7 +143,7 @@ const Calendar = () => {
           className="text-3xl font-semibold pb-1 pl-2"
           style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
         >
-          {days[currentDay % 7]}
+          {days[currentDay]}
         </Text>
 
         <ScrollView
@@ -139,22 +151,26 @@ const Calendar = () => {
           showsHorizontalScrollIndicator={false}
           className="ml-2 py-4"
         >
-          {days.map((day, index) => (
+          {days.map((_, index) => (
             <Pressable
               key={index}
-              onPress={() => setCurrentDay(index)}
+              onPress={() => setCurrentDay((index + offset) % 7)}
               style={{
                 backgroundColor:
-                  currentDay % 7 === index ? primaryOrange : mainGray,
+                  currentDay === (index + offset) % 7
+                    ? primaryOrange
+                    : mainGray,
               }}
               className={`px-4 py-2 mr-3 rounded-lg`}
             >
               <Text
                 className={`text-lg font-medium ${
-                  currentDay % 7 === index ? "text-white" : "text-black"
+                  currentDay === (index + offset) % 7
+                    ? "text-white"
+                    : "text-black"
                 }`}
               >
-                {day}
+                {days[(index + offset) % 7]}
               </Text>
             </Pressable>
           ))}
@@ -164,6 +180,7 @@ const Calendar = () => {
       <View className="h-[85%]">
         <CalendarDataList
           showGrid={showGrid}
+          // new Map(json.data.Page.media.map((anime) => [anime.id, anime])).values()
           data={data.pages
             .flatMap((page) => page.data.Page.airingSchedules)
             .filter(

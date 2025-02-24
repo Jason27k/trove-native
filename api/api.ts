@@ -1,6 +1,7 @@
 import {
   CalendarQueryResponse,
   MediaDisplay,
+  MediaResponse,
   SearchQueryResponse,
 } from "./model";
 
@@ -246,7 +247,7 @@ query media($id: Int) {
 
 export const fetchAniListAnime = async (id: number) => {
   const query = animeIdQuery;
-  return await fetch("https://graphql.anilist.co", {
+  const response = await fetch("https://graphql.anilist.co", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -257,6 +258,8 @@ export const fetchAniListAnime = async (id: number) => {
       variables: { id },
     }),
   });
+  const json: MediaResponse = await response.json();
+  return json.data.Media;
 };
 
 const calendarQuery = `

@@ -8,6 +8,7 @@ const top = () => {
         queryKey="top"
         variables={{ sort: ["SCORE_DESC"] }}
         title="All Time Popular"
+        stepsBack={2}
       />
     </ThemedView>
   );

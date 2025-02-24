@@ -52,6 +52,16 @@ export default function RootLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
+        }}
+      />
     </Stack>
   );
 }

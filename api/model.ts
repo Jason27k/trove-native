@@ -91,7 +91,7 @@ type AiringEpisodeType = {
   episode: number;
 };
 
-type RelationEdge = {
+export type RelationEdge = {
   id: number;
   relationType: string;
   node: {
@@ -106,7 +106,7 @@ type RelationEdge = {
   };
 };
 
-type CharacterEdge = {
+export type CharacterEdge = {
   id: number;
   role: "MAIN" | "SUPPORTING";
   name?: string;
@@ -125,7 +125,7 @@ type VoiceActor = {
   image: { large: string };
 };
 
-type StaffEdge = {
+export type StaffEdge = {
   id: number;
   role: string;
   node: {
@@ -156,7 +156,7 @@ type ReviewNode = {
   };
 };
 
-type RecommendationNode = {
+export type RecommendationNode = {
   id: number;
   rating: number;
   userRating: "NO_RATING";
