@@ -1,17 +1,17 @@
 import ThemedView from "@/components/ThemedView";
 import DataList from "@/components/DataList";
 
-const top = () => {
+const upcoming = () => {
   return (
     <ThemedView>
       <DataList
-        queryKey="top"
-        variables={{ sort: ["SCORE_DESC"] }}
-        title="All Time Ranked"
+        queryKey="popular"
+        variables={{ sort: ["POPULARITY_DESC"] }}
+        title="Featured Anime"
         stepsBack={2}
       />
     </ThemedView>
   );
 };
 
-export default top;
+export default upcoming;

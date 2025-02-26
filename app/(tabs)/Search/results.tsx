@@ -19,7 +19,7 @@ import { animeSearch } from "@/api/api";
 import { Link, useNavigation } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
-import { MediaDisplay } from "@/api/model";
+import AnimeCardGrid from "@/components/AnimeCardGrid";
 
 const fetchSearch = async ({ pageParam = 1 }, search: string) => {
   console.log("fetchSearch", pageParam, search);
@@ -229,7 +229,7 @@ const Search = () => {
                 className="mb-4"
                 data={extractAndDeDuplicatedAnimes(data)}
                 renderItem={({ item: media }) => (
-                  <GridItem media={media} colorScheme={colorScheme} />
+                  <AnimeCardGrid media={media} stepsBack={2} />
                 )}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
@@ -308,36 +308,4 @@ const Search = () => {
   );
 };
 
-const GridItem = ({
-  media,
-  colorScheme,
-}: {
-  media: MediaDisplay;
-  colorScheme: ColorSchemeName;
-}) => {
-  return (
-    <Link href={`../${media.id}`} asChild relativeToDirectory>
-      <Pressable className="flex-1 p-2 max-w-[50%]">
-        <Image
-          className="w-full aspect-[2/3] rounded-lg"
-          source={{ uri: media.coverImage.extraLarge }}
-        />
-        <Text
-          className={`text-lg font-semibold pt-2 text-center line-clamp-1 ${
-            colorScheme === "dark" ? "text-white" : "text-black"
-          }`}
-        >
-          {media.title.english || media.title.romaji || media.title.native}
-        </Text>
-        <Text
-          className={`text-md text-center pb-2 line-clamp-2 ${
-            colorScheme === "dark" ? "text-gray-400" : "text-gray-600"
-          }`}
-        >
-          {media.description ? media.description.replace(/<[^>]*>/g, "") : ""}
-        </Text>
-      </Pressable>
-    </Link>
-  );
-};
 export default Search;

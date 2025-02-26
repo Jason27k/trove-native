@@ -1,7 +1,5 @@
 import {
-  ColorSchemeName,
   FlatList,
-  Image,
   Pressable,
   ScrollView,
   Text,
@@ -12,12 +10,13 @@ import Octicons from "@expo/vector-icons/Octicons";
 import ThemedView from "@/components/ThemedView";
 import { animeSearch, fetchSearch, SearchQueryVariables } from "@/api/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { mainGray, primaryOrange, secondaryOrange } from "@/constants/Colors";
+import { primaryOrange } from "@/constants/Colors";
 import { Link } from "expo-router";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
 import SuspenseHome from "@/components/SuspenseHome";
 import { Suspense } from "react";
 import { MediaDisplay } from "@/api/model";
+import AnimeCard from "@/components/AnimeCard";
 
 const fetchUpcoming = async () => {
   let year = new Date().getFullYear();
@@ -100,6 +99,34 @@ export default function Index() {
     },
   });
 
+  const popularVariables: SearchQueryVariables = {
+    sort: ["POPULARITY_DESC"],
+    page: 1,
+  };
+
+  const {
+    data: popularData,
+    isPending: isPopularPending,
+    isError: isPopularError,
+    error: popularError,
+  } = useInfiniteQuery({
+    queryKey: ["popular"],
+    queryFn: () => {
+      return fetchSearch(popularVariables);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.data.Page.pageInfo.hasNextPage) {
+        return pages.length + 1;
+      }
+    },
+    getPreviousPageParam: (firstPage, pages) => {
+      if (firstPage.data.Page.pageInfo.currentPage > 1) {
+        return pages.length - 1;
+      }
+    },
+  });
+
   const {
     data: upcomingData,
     isPending: upcomingPending,
@@ -120,11 +147,11 @@ export default function Index() {
     },
   });
 
-  if (isPending || topPending || upcomingPending) {
+  if (isPending || topPending || upcomingPending || isPopularPending) {
     return <SuspenseHome colorScheme={colorScheme} />;
   }
 
-  if (error || topError || upcomingError) {
+  if (error || topError || upcomingError || isPopularError) {
     return <Text>Error</Text>;
   }
 
@@ -132,126 +159,69 @@ export default function Index() {
     <ThemedView>
       <Suspense fallback={<SuspenseHome colorScheme={colorScheme} />}>
         <ScrollView>
-          <View className="flex flex-row justify-between">
-            <Link href="/home/trending" asChild>
-              <Pressable className="pb-4">
-                <Text
-                  className="text-3xl font-semibold"
-                  style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-                >
-                  Featured Anime
-                </Text>
-              </Pressable>
-            </Link>
-            <Link href="/home/trending" asChild>
-              <Pressable>
-                <Octicons
-                  name="chevron-right"
-                  size={24}
-                  color={colorScheme === "dark" ? primaryOrange : "#000"}
-                />
-              </Pressable>
-            </Link>
+          <View className="pb-4">
+            <ListHeader title="Featured Anime" href="/home/trending" />
+            <HorizontalList
+              data={extractAndDeDuplicatedAnimes(data)}
+              featured={true}
+            />
           </View>
-          <HorizontalList
-            data={extractAndDeDuplicatedAnimes(data)}
-            colorScheme={colorScheme}
-          />
-          <View className="flex flex-row justify-between py-4">
-            <Link push href="/home/top" asChild>
-              <Pressable className="pb-2">
-                <Text
-                  className="text-3xl font-semibold"
-                  style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-                >
-                  All Time Popular
-                </Text>
-              </Pressable>
-            </Link>
-            <Link href="/home/top" asChild>
-              <Pressable>
-                <Octicons
-                  name="chevron-right"
-                  size={24}
-                  color={colorScheme === "dark" ? primaryOrange : "#000"}
-                />
-              </Pressable>
-            </Link>
+
+          <View className="pb-4">
+            <ListHeader title="All Time Ranked" href="/home/top" />
+            <HorizontalList data={extractAndDeDuplicatedAnimes(topData)} />
           </View>
-          <HorizontalList
-            data={extractAndDeDuplicatedAnimes(topData)}
-            colorScheme={colorScheme}
-          />
-          <View className="flex flex-row justify-between pt-6 pb-4">
-            <Link href="/home/upcoming" asChild>
-              <Pressable>
-                <Text
-                  className="text-3xl font-semibold pb-4"
-                  style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-                >
-                  Upcoming Anime
-                </Text>
-              </Pressable>
-            </Link>
-            <Link href="/home/upcoming" asChild>
-              <Pressable>
-                <Octicons
-                  name="chevron-right"
-                  size={24}
-                  color={colorScheme === "dark" ? primaryOrange : "#000"}
-                />
-              </Pressable>
-            </Link>
+
+          <View className="pb-4">
+            <ListHeader title="Popular Anime" href="/home/popular" />
+            <HorizontalList data={extractAndDeDuplicatedAnimes(popularData)} />
           </View>
-          <HorizontalList
-            data={extractAndDeDuplicatedAnimes(upcomingData)}
-            colorScheme={colorScheme}
-          />
+
+          <View className="pb-4">
+            <ListHeader title="Upcoming Anime" href="/home/upcoming" />
+            <HorizontalList data={extractAndDeDuplicatedAnimes(upcomingData)} />
+          </View>
         </ScrollView>
       </Suspense>
     </ThemedView>
   );
 }
 
+const ListHeader = ({ title, href }: { title: string; href: string }) => {
+  return (
+    <View className="flex flex-row justify-between">
+      <Link href={href} asChild>
+        <Pressable className="pb-4">
+          <Text className="text-3xl font-semibold dark:text-white text-black">
+            {title}
+          </Text>
+        </Pressable>
+      </Link>
+      <Link href={href} asChild>
+        <Pressable>
+          <Octicons name="chevron-right" size={24} color={primaryOrange} />
+        </Pressable>
+      </Link>
+    </View>
+  );
+};
+
 const HorizontalList = ({
   data,
-  colorScheme,
+  featured = false,
 }: {
   data: MediaDisplay[];
-  colorScheme: ColorSchemeName;
+  featured?: boolean;
 }) => {
   return (
     <FlatList
       data={data}
-      renderItem={(media) => (
-        <Link href={`./${media.item.id}`} asChild relativeToDirectory>
-          <Pressable className="w-[42vw] pr-4">
-            <Image
-              className="w-full aspect-[2/3] rounded-lg"
-              source={{
-                uri: media.item.coverImage.extraLarge,
-              }}
-            />
-            <Text
-              style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-              className="text-lg font-semibold pt-2 text-center line-clamp-1"
-            >
-              {media.item.title.english || media.item.title.native}
-            </Text>
-            <Text
-              style={{
-                color: colorScheme === "dark" ? mainGray : "#4b5563",
-              }}
-              className="text-md text-center pb-2 line-clamp-2"
-            >
-              {media.item.description.replace(/<[^>]*>/g, "")}
-            </Text>
-          </Pressable>
-        </Link>
-      )}
+      renderItem={({ item }) => <AnimeCard item={item} featured={featured} />}
       keyExtractor={(item) => item.idMal.toString()}
-      horizontal={true}
+      horizontal
       showsHorizontalScrollIndicator={false}
+      contentContainerClassName="pb-2"
+      className="-mx-4 px-4"
     />
   );
 };

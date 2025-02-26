@@ -13,6 +13,7 @@ import { mainGray, primaryOrange, tabGray } from "@/constants/Colors";
 import { convertUTCToLocal } from "@/lib/utils";
 import { AiringSchedule } from "@/api/model";
 import { Link } from "expo-router";
+import AnimeCardCalendar from "./AnimeCardCalendar";
 
 interface CalendarDataListProps {
   data: AiringSchedule[];
@@ -33,9 +34,7 @@ const CalendarDataList: React.FC<CalendarDataListProps> = ({
           data={Array.from(
             new Map(data.map((anime) => [anime.media.id, anime])).values()
           )}
-          renderItem={({ item }) => (
-            <GridItem item={item} colorScheme={colorScheme} />
-          )}
+          renderItem={({ item }) => <AnimeCardCalendar item={item} />}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
         />
@@ -101,40 +100,3 @@ const CalendarDataList: React.FC<CalendarDataListProps> = ({
 };
 
 export default CalendarDataList;
-
-const GridItem = ({
-  item,
-  colorScheme,
-}: {
-  item: AiringSchedule;
-  colorScheme: ColorSchemeName;
-}) => {
-  return (
-    <Link href={`./${item.media.id}`} asChild relativeToDirectory>
-      <Pressable className="flex-1 p-2 max-w-[50%]">
-        <View>
-          <Image
-            className="w-full aspect-[2/3] rounded-lg"
-            source={{ uri: item.media.coverImage.extraLarge }}
-          />
-          <Text
-            className={`text-lg font-semibold pt-2 text-center line-clamp-1 ${
-              colorScheme === "dark" ? "text-white" : "text-black"
-            }`}
-          >
-            {item.media.title.english ||
-              item.media.title.romaji ||
-              item.media.title.native}
-          </Text>
-          <Text
-            className={`text-md text-center pb-2 line-clamp-2 ${
-              colorScheme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            {convertUTCToLocal(item.airingAt).toLocaleTimeString()}
-          </Text>
-        </View>
-      </Pressable>
-    </Link>
-  );
-};

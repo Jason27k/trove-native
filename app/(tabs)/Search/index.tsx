@@ -1,4 +1,5 @@
 import { fetchSearch, SearchQueryVariables } from "@/api/api";
+import AnimeCardGrid from "@/components/AnimeCardGrid";
 import { GridItem } from "@/components/DataList";
 import ThemedView from "@/components/ThemedView";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
@@ -73,7 +74,7 @@ const Search = () => {
         key="grid"
         data={extractAndDeDuplicatedAnimes(data)}
         renderItem={({ item: media }) => (
-          <GridItem media={media} colorScheme={colorScheme} stepsBack={1} />
+          <AnimeCardGrid media={media} stepsBack={1} />
         )}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}

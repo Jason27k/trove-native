@@ -47,6 +47,16 @@ const _layout = () => {
         }}
       />
       <Stack.Screen
+        name="popular"
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          },
+        }}
+      />
+      <Stack.Screen
         name="[id]"
         options={{
           headerShown: true,
