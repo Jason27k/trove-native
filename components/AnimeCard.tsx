@@ -38,7 +38,7 @@ const AnimeCard = ({
           )}
 
           <View className="pt-2">
-            <Text className="text-base font-semibold dark:text-white text-black">
+            <Text className="text-base font-semibold dark:text-white text-black line-clamp-1">
               {item.title.english || item.title.native}
             </Text>
             <Text className="text-sm dark:text-gray-400 text-gray-600 line-clamp-2">

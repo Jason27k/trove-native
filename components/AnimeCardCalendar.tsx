@@ -27,7 +27,7 @@ const AnimeCardCalendar = ({ item }: { item: AiringSchedule }) => {
           )}
 
           <View className="pt-2">
-            <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 dark:text-white text-black">
+            <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 dark:text-white text-black ">
               {item.media.title.english ||
                 item.media.title.romaji ||
                 item.media.title.native}

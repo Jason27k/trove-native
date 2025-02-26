@@ -159,7 +159,7 @@ export default function Index() {
     <ThemedView>
       <Suspense fallback={<SuspenseHome colorScheme={colorScheme} />}>
         <ScrollView>
-          <View className="pb-4">
+          <View className="pt-4">
             <ListHeader title="Featured Anime" href="/home/trending" />
             <HorizontalList
               data={extractAndDeDuplicatedAnimes(data)}
@@ -167,17 +167,17 @@ export default function Index() {
             />
           </View>
 
-          <View className="pb-4">
+          <View className="pt-4">
             <ListHeader title="All Time Ranked" href="/home/top" />
             <HorizontalList data={extractAndDeDuplicatedAnimes(topData)} />
           </View>
 
-          <View className="pb-4">
+          <View className="pt-4">
             <ListHeader title="Popular Anime" href="/home/popular" />
             <HorizontalList data={extractAndDeDuplicatedAnimes(popularData)} />
           </View>
 
-          <View className="pb-4">
+          <View className="pt-4">
             <ListHeader title="Upcoming Anime" href="/home/upcoming" />
             <HorizontalList data={extractAndDeDuplicatedAnimes(upcomingData)} />
           </View>

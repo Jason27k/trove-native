@@ -36,7 +36,7 @@ const AnimeCardGrid = ({
           )}
 
           <View className="pt-2">
-            <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 dark:text-white text-black">
+            <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 dark:text-white text-black line-clamp-1">
               {media.title.english || media.title.romaji || media.title.native}
             </Text>
             <Text className="text-md text-center pb-2 line-clamp-2 dark:text-gray-400 text-gray-600">
