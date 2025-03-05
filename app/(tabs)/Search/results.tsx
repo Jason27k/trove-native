@@ -7,7 +7,6 @@ import {
   FlatList,
   Pressable,
   Image,
-  ColorSchemeName,
 } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -159,8 +158,8 @@ const Search = () => {
 
   return (
     <ThemedView>
-      <View className="flex flex-row justify-between">
-        <View className="flex flex-row items-end gap-4 h-7">
+      <View className="flex flex-row justify-between items-center w-full">
+        <View className="flex flex-row items-center">
           <FontAwesome6
             name="magnifying-glass"
             size={24}
@@ -168,14 +167,16 @@ const Search = () => {
           />
           <TextInput
             placeholder="Anime Name"
-            className="text-xl"
+            placeholderTextColor={"#475569"}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="text-2xl text-black dark:text-white ml-5"
             selectionColor={primaryOrange}
-            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
             value={search}
             onChangeText={handleSearchChange}
           />
         </View>
-        <Pressable onPress={handleClearInput}>
+        <Pressable onPress={handleClearInput} className="">
           <Octicons name="x-circle-fill" size={24} color={primaryOrange} />
         </Pressable>
       </View>

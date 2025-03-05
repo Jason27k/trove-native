@@ -36,10 +36,10 @@ const AnimeCardGrid = ({
           )}
 
           <View className="pt-2">
-            <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 dark:text-white text-black line-clamp-1">
+            <Text className="text-lg font-semibold pt-2 text-left line-clamp-1 dark:text-white text-black">
               {media.title.english || media.title.romaji || media.title.native}
             </Text>
-            <Text className="text-md text-center pb-2 line-clamp-2 dark:text-gray-400 text-gray-600">
+            <Text className="text-md text-left pb-2 line-clamp-2 dark:text-gray-400 text-gray-600">
               {media.description
                 ? media.description.replace(/<[^>]*>/g, "")
                 : ""}

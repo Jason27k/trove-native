@@ -1,6 +1,7 @@
 import { useColorScheme } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
+import { primaryOrange } from "@/constants/Colors";
 
 const _layout = () => {
   const colorScheme = useColorScheme();
@@ -24,6 +25,7 @@ const _layout = () => {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
       <Stack.Screen
@@ -34,6 +36,7 @@ const _layout = () => {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
       <Stack.Screen
@@ -44,6 +47,7 @@ const _layout = () => {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
       <Stack.Screen
@@ -54,6 +58,7 @@ const _layout = () => {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
       <Stack.Screen
@@ -64,6 +69,7 @@ const _layout = () => {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
     </Stack>

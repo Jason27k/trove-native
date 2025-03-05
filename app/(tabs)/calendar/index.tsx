@@ -25,7 +25,6 @@ const Calendar = () => {
   const [showGrid, setShowGrid] = useState(true);
   const navigation = useNavigation();
   const { startOfWeek, endOfWeek } = getWeekRangeFromToday();
-  console.log(startOfWeek, endOfWeek);
 
   const { data, error, fetchNextPage, hasNextPage, isFetching, isPending } =
     useInfiniteQuery({

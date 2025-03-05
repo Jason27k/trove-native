@@ -1,6 +1,6 @@
 import {
   CalendarQueryResponse,
-  MediaDisplay,
+  LikedList,
   MediaResponse,
   SearchQueryResponse,
 } from "./model";
@@ -422,8 +422,6 @@ query ($page: Int = 1, $id: Int, $isAdult: Boolean = false, $search: String, $st
 }
 `;
 
-// $page: Int = 1, $id: Int, $isAdult: Boolean = false, $search: String, $status: MediaStatus, $season: MediaSeason, $seasonYear: Int, $year: String, $genres: [String], $sort
-
 export type SearchQueryVariables = {
   page?: number;
   id?: number;
@@ -594,76 +592,100 @@ export async function getLikedAnimesList(
   return likedAnimes;
 }
 
-// import { currentUser } from "@clerk/nextjs/server";
-// import { and, eq } from "drizzle-orm";
-// import { revalidatePath } from "next/cache";
+const query = `
+query {
+  Viewer {
+    id
+    name
+    avatar {
+      large
+    }
+    statistics {
+      anime {
+        count
+        minutesWatched
+        meanScore
+      }
+      manga {
+        count
+        meanScore
+        chaptersRead
+      }
+    }
+  }
+}
+`;
 
-// export async function addToMyList(
-//   animeId: number,
-//   status: "watching" | "finished",
-//   refresh: boolean,
-//   formData: FormData
-// ) {
-//   const user = await currentUser();
-//   if (!user) {
-//     return;
-//   }
+import { UserStats } from "./model";
 
-//   const alreadyLiked = await db.$count(
-//     MyAnimesTable,
-//     and(eq(MyAnimesTable.anime_id, animeId), eq(MyAnimesTable.user_id, user.id))
-//   );
+export async function getUserStats(token: string) {
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query,
+    }),
+  });
+  const json: UserStats = await response.json();
+  return json;
+}
 
-//   if (alreadyLiked) {
-//     return;
-//   }
+const mediaListQuery = `
+query($page: Int, $perPage: Int, $userId: Int, $type: MediaType) {
+  Page(page: $page, perPage: $perPage) {
+    mediaList(userId: $userId, type: $type) {
+      media {
+        id
+        title {
+          english
+          native
+          romaji
+        }
+        coverImage {
+          extraLarge
+        }
+        episodes
+        nextAiringEpisode {
+          airingAt
+          episode
+          timeUntilAiring
+        }
+        genres
+        averageScore
+      }
+      status
+    }
+    pageInfo {
+      currentPage
+      hasNextPage
+      total
+    }
+  }
+}
+`;
 
-//   let result = await db.insert(MyAnimesTable).values({
-//     anime_id: animeId,
-//     user_id: user.id,
-//     episode: formData.get("episodeNumber")
-//       ? parseInt(formData.get("episodeNumber") as string)
-//       : null,
-//     finished: status === "finished",
-//   });
+export async function getMediaList(
+  userId: number,
+  page: number,
+  perPage: number,
+  type: "ANIME" | "MANGA"
+) {
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      query: mediaListQuery,
+      variables: { page: page, perPage: perPage, userId, type },
+    }),
+  });
+  const json: LikedList = await response.json();
 
-//   if (refresh) {
-//     revalidatePath(`/anime/${animeId}`);
-//   }
-//   return result;
-// }
-
-// export async function removefromMyList(animeId: number, refresh: boolean) {
-//   const user = await currentUser();
-//   if (!user) {
-//     return;
-//   }
-
-//   let result = await db
-//     .delete(MyAnimesTable)
-//     .where(
-//       and(
-//         eq(MyAnimesTable.anime_id, animeId),
-//         eq(MyAnimesTable.user_id, user.id)
-//       )
-//     );
-
-//   if (refresh) {
-//     revalidatePath(`/anime/${animeId}`);
-//   }
-
-//   return result;
-// }
-
-// export async function fetchMyAnimeIds() {
-//   const user = await currentUser();
-//   if (!user) {
-//     return;
-//   }
-//   const likedAnimes = await db
-//     .select({ id: MyAnimesTable.anime_id })
-//     .from(MyAnimesTable)
-//     .where(eq(MyAnimesTable.user_id, user.id));
-
-//   return likedAnimes.map((anime) => anime.id);
-// }
+  return json;
+}

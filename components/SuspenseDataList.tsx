@@ -9,13 +9,7 @@ import React from "react";
 import { primaryOrange, tabGray, mainGray } from "@/constants/Colors";
 import Octicons from "@expo/vector-icons/Octicons";
 
-const SuspenseDataList = ({
-  showGrid,
-  colorScheme,
-}: {
-  showGrid: boolean;
-  colorScheme: ColorSchemeName;
-}) => {
+const SuspenseDataList = ({ showGrid }: { showGrid: boolean }) => {
   return (
     <View>
       {showGrid ? (
@@ -41,13 +35,7 @@ const SuspenseDataList = ({
           className="h-full first:rounded-t-xl last:rounded-b-xl"
           data={[...Array(10)]}
           renderItem={() => (
-            <View
-              className="flex flex-row items-center border-b-[1px]"
-              style={{
-                borderColor: colorScheme === "dark" ? "black" : "white",
-                backgroundColor: colorScheme === "dark" ? tabGray : mainGray,
-              }}
-            >
+            <View className="flex flex-row items-center border-b-[1px] dark:border-black border-white dark:bg-tabGray bg-mainGray">
               <Text className="mx-2 my-2 bg-gray-200 rounded-lg dark:bg-gray-700 w-[80px] h-[120px]" />
               <Text className="text-lg font-semibold bg-gray-200 rounded-full dark:bg-gray-700 w-64 pl-3 pb-6"></Text>
               <Octicons

@@ -334,3 +334,52 @@ type PageInfoSearch = {
   lastPage: number;
   hasNextPage: boolean;
 };
+
+export type UserStats = {
+  data: {
+    Viewer: {
+      id: number;
+      name: string;
+      avatar: { large: string };
+      statistics: {
+        anime: {
+          count: number;
+          minutesWatched: number;
+          meanScore: number;
+        };
+        manga: {
+          count: number;
+          meanScore: number;
+          chaptersRead: number;
+        };
+      };
+    };
+  };
+};
+
+export type LikedList = {
+  data: {
+    Page: {
+      pageInfo: PageInfo;
+      mediaList: [
+        {
+          media: LikedMedia;
+          status: string;
+        }
+      ];
+    };
+  };
+};
+
+export type LikedMedia = {
+  id: number;
+  title: Title;
+  coverImage: {
+    extraLarge: string;
+  };
+  episodes?: number;
+  nextAiringEpisode?: AiringEpisode;
+  genres: string[];
+  status: string;
+  meanScore: number;
+};

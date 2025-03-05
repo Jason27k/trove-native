@@ -1,15 +1,11 @@
 import { fetchSearch, SearchQueryVariables } from "@/api/api";
 import AnimeCardGrid from "@/components/AnimeCardGrid";
-import { GridItem } from "@/components/DataList";
 import ThemedView from "@/components/ThemedView";
 import { extractAndDeDuplicatedAnimes } from "@/lib/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { FlatList, View, Text, StyleSheet } from "react-native";
-import { useColorScheme } from "react-native";
+import { FlatList, View, Text, StyleSheet, StatusBar } from "react-native";
 
 const Search = () => {
-  const colorScheme = useColorScheme();
-
   const { data, isPending, isError, isFetching, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
       queryKey: ["top"],

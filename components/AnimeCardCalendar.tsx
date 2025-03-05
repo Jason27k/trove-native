@@ -27,12 +27,12 @@ const AnimeCardCalendar = ({ item }: { item: AiringSchedule }) => {
           )}
 
           <View className="pt-2">
-            <Text className="text-lg font-semibold pt-2 text-center line-clamp-1 dark:text-white text-black ">
+            <Text className="text-lg font-semibold pt-2 text-left line-clamp-1 dark:text-white text-black ">
               {item.media.title.english ||
                 item.media.title.romaji ||
                 item.media.title.native}
             </Text>
-            <Text className="text-md text-center pb-2 line-clamp-2 dark:text-gray-400 text-gray-600">
+            <Text className="text-md text-left pb-2 line-clamp-2 dark:text-gray-400 text-gray-600">
               {item.airingAt
                 ? convertUTCToLocal(item.airingAt).toLocaleTimeString()
                 : item.media.description.replace(/<[^>]*>/g, "")}

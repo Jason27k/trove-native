@@ -50,6 +50,7 @@ export default function RootLayout() {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
       <Stack.Screen
@@ -60,6 +61,7 @@ export default function RootLayout() {
           headerStyle: {
             backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
           },
+          headerTintColor: primaryOrange,
         }}
       />
     </Stack>

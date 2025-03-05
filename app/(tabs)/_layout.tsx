@@ -23,7 +23,7 @@ export default function RootLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: "home",
+          title: "Home",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="home" size={24} color={color} />
@@ -31,8 +31,9 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="Search"
+        name="search"
         options={{
+          title: "Search",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome6 name="magnifying-glass" size={24} color={color} />
@@ -40,8 +41,9 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="Liked"
+        name="liked"
         options={{
+          title: "Liked",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <AntDesign name="heart" size={24} color={color} />
@@ -63,13 +65,11 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="Profile"
+        name="profile"
         options={{
-          headerShown: true,
+          title: "Profile",
+          headerShown: false,
           headerTitle: "",
-          headerStyle: {
-            backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
-          },
           tabBarIcon: ({ color }) => (
             <FontAwesome name="user-circle" size={24} color={color} />
           ),
